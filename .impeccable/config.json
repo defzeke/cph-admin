@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-11-10T18:42:16.567Z",
+        "reason": "Claude: fonts copied from cph-membership-forms globals.css; user asked to match that repo's design exactly"
+      }
+    ]
+  }
+}
