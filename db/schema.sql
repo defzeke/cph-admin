@@ -30,13 +30,20 @@ CREATE TABLE IF NOT EXISTS deadlines (
   status text NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Done'))
 );
 
+-- Failed /login attempts per "ip|email" key (lib/login-limit.ts).
+CREATE TABLE IF NOT EXISTS login_attempts (
+  key          text PRIMARY KEY,
+  failures     int NOT NULL DEFAULT 0,
+  locked_until timestamptz
+);
+
 -- Row level security: only the admin app's role (neondb_owner, DATABASE_URL) may read or write.
 -- Any other role (e.g. Data API / token roles) gets no grants and no policy, so it sees nothing.
 -- FORCE applies RLS to the table owner too; neondb_owner still passes through its own policy.
 DO $$
 DECLARE t text;
 BEGIN
-  FOREACH t IN ARRAY ARRAY['members', 'deadlines'] LOOP
+  FOREACH t IN ARRAY ARRAY['members', 'deadlines', 'login_attempts'] LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
     EXECUTE format('ALTER TABLE %I FORCE ROW LEVEL SECURITY', t);
     EXECUTE format('REVOKE ALL ON %I FROM PUBLIC', t);
