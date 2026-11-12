@@ -26,11 +26,3 @@ export async function addMember(formData: FormData) {
   );
   revalidatePath("/admin/members");
 }
-
-export async function deleteMember(formData: FormData) {
-  await requireAdmin();
-  const id = String(formData.get("id") ?? "");
-  if (!/^\d+$/.test(id)) throw new Error("Invalid id.");
-  await adminDb.query("DELETE FROM members WHERE id = $1", [id]);
-  revalidatePath("/admin/members");
-}

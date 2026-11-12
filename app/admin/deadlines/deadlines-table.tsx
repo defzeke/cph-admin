@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import type { Deadline } from "@/lib/admin-data";
-import ConfirmButton from "../applications/questions/confirm-button";
 import { formatDate } from "../data";
 import { td, th } from "../ui";
-import { deleteDeadline } from "./actions";
 import StatusSelect from "./status-select";
 
 const STATUS_FILTERS = ["All", "Not done", "Done"] as const;
@@ -69,7 +67,6 @@ export default function DeadlinesTable({ deadlines, today }: { deadlines: Deadli
                 <th className={th}>Task</th>
                 <th className={th}>Department</th>
                 <th className={th}>Status</th>
-                <th className={th}><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
             <tbody>
@@ -86,14 +83,6 @@ export default function DeadlinesTable({ deadlines, today }: { deadlines: Deadli
                     <td className={td}>
                       {/* key resets the select if the saved status changes */}
                       <StatusSelect key={d.status} id={d.id} status={d.status} />
-                    </td>
-                    <td className={`${td} text-right`}>
-                      <form action={deleteDeadline}>
-                        <input type="hidden" name="id" value={d.id} />
-                        <ConfirmButton message={`Delete "${d.title}"?`} className="text-xs font-medium text-rose-700 hover:underline">
-                          Delete
-                        </ConfirmButton>
-                      </form>
                     </td>
                   </tr>
                 );

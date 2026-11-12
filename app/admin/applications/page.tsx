@@ -1,12 +1,9 @@
-import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { listApplications } from "@/lib/applications";
 import { DEPARTMENTS } from "@/lib/departments";
-import { formatDate } from "../data";
-import { Panel, td, th } from "../ui";
-import RowLink from "./row-link";
-import ApplicationStatusSelect from "./status-select";
+import { Panel } from "../ui";
+import ApplicantsTable from "./applicants-table";
 
 export default function ApplicantsPage() {
   return (
@@ -45,40 +42,7 @@ async function Applicants() {
         {apps.length === 0 ? (
           <p className="text-sm text-slate-500">No applications yet.</p>
         ) : (
-          <div className="-mx-3 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr>
-                  <th className={`${th} w-12`}>#</th>
-                  <th className={th}>Name</th>
-                  <th className={th}>Position</th>
-                  <th className={th}>College</th>
-                  <th className={th}>Submitted</th>
-                  <th className={`${th} text-right`}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {apps.map((a, i) => (
-                  <RowLink key={a.id} href={`/admin/applications/${a.id}`}>
-                    {/* numbered by submission order: the newest gets the highest number */}
-                    <td className={`${td} tabular-nums text-slate-500`}>{apps.length - i}</td>
-                    <td className={`${td} whitespace-nowrap font-medium text-slate-900`}>
-                      <Link href={`/admin/applications/${a.id}`} className="hover:underline">
-                        {a.first_name} {a.last_name}
-                      </Link>
-                    </td>
-                    <td className={`${td} text-slate-700`}>{a.role}</td>
-                    <td className={`${td} text-slate-700`}>{a.college_campus}</td>
-                    <td className={`${td} whitespace-nowrap tabular-nums text-slate-600`}>{formatDate(a.created_at)}</td>
-                    <td className={`${td} text-right`}>
-                      {/* key resets the select if the saved status changes */}
-                      <ApplicationStatusSelect key={a.status} id={a.id} status={a.status} />
-                    </td>
-                  </RowLink>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ApplicantsTable apps={apps} />
         )}
       </Panel>
     </div>

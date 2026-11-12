@@ -42,9 +42,3 @@ export async function addDeadline(formData: FormData) {
   ]);
   refresh();
 }
-
-export async function deleteDeadline(formData: FormData) {
-  await requireAdmin();
-  await adminDb.query("DELETE FROM deadlines WHERE id = $1", [readId(formData)]);
-  refresh();
-}

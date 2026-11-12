@@ -3,9 +3,7 @@
 import { useState } from "react";
 import type { Member } from "@/lib/admin-data";
 import { MEMBER_CATEGORIES } from "@/lib/statuses";
-import ConfirmButton from "../applications/questions/confirm-button";
 import { Status, td, th } from "../ui";
-import { deleteMember } from "./actions";
 
 // Officer order: President, EVP, Chief of Staff, VPs (equal), AVPs, other executives, then by category.
 // shortcut: matches on the position text; a title outside these patterns ranks by its category only.
@@ -78,7 +76,6 @@ export default function MembersTable({ members }: { members: Member[] }) {
                 <th className={th}>Department</th>
                 <th className={th}>College</th>
                 <th className={th}>Category</th>
-                <th className={th}><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
             <tbody>
@@ -89,14 +86,6 @@ export default function MembersTable({ members }: { members: Member[] }) {
                   <td className={`${td} whitespace-nowrap text-slate-700`}>{m.department}</td>
                   <td className={`${td} text-slate-700`}>{m.college ?? <span className="text-slate-400">—</span>}</td>
                   <td className={td}><Status value={m.category} /></td>
-                  <td className={`${td} text-right`}>
-                    <form action={deleteMember}>
-                      <input type="hidden" name="id" value={m.id} />
-                      <ConfirmButton message={`Delete ${m.name}?`} className="text-xs font-medium text-rose-700 hover:underline">
-                        Delete
-                      </ConfirmButton>
-                    </form>
-                  </td>
                 </tr>
               ))}
             </tbody>

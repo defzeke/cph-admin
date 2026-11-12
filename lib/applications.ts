@@ -11,12 +11,15 @@ export type ApplicationRow = {
   college_campus: string;
   role: string;
   department: string;
+  email: string;
+  phone: string;
+  course_year_section: string;
 };
 
 export async function listApplications() {
   const { rows } = await pool.query<ApplicationRow>(
     `SELECT a.id::text AS id, a.created_at, a.status, p.first_name, p.last_name, p.college_campus,
-            r.name AS role, d.name AS department
+            r.name AS role, d.name AS department, p.email, p.phone, p.course_year_section
      FROM applications a
      JOIN registration_personal_info p ON p.id = a.user_id
      JOIN department_roles r ON r.id = a.role_id

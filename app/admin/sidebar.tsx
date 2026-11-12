@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { logout } from "@/app/login/actions";
-import { ApplicationsIcon, DeadlinesIcon, DocumentsIcon, GpoaIcon, LogoutIcon, MembersIcon, OverviewIcon, ToolsIcon } from "./icons";
+import { ApplicationsIcon, DeadlinesIcon, DocumentsIcon, LogoutIcon, MembersIcon, OverviewIcon, ToolsIcon } from "./icons";
 
 const main = [
   { href: "/admin", label: "Overview", icon: <OverviewIcon /> },
@@ -13,7 +13,6 @@ const main = [
   { href: "/admin/members", label: "Members", icon: <MembersIcon /> },
   { href: "/admin/deadlines", label: "Deadlines", icon: <DeadlinesIcon /> },
   { href: "/admin/applications", label: "Applications", icon: <ApplicationsIcon /> },
-  { href: "/admin/gpoa", label: "GPOA", icon: <GpoaIcon /> },
   { href: "/admin/tools", label: "Tools", icon: <ToolsIcon /> },
 ];
 
