@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense, type ReactNode } from "react";
 import { getAdmin } from "@/lib/auth";
 import Sidebar, { SidebarView } from "./sidebar";
@@ -20,6 +21,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
 // proxy.ts already sent non-admins to /login; this just reads who is signed in.
 async function AccountSidebar() {
+  // Request-time only: without this the build prerenders it and Neon Auth logs a cookies() error.
+  await connection();
   const admin = await getAdmin();
   return <Sidebar name={admin?.name ?? ""} email={admin?.email ?? ""} />;
 }
