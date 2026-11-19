@@ -125,9 +125,12 @@ function Department({ slug, rows: deptRows }: { slug: string; rows: QuestionRow[
 
 function Role({ roleId, rows }: { roleId: string; rows: QuestionRow[] }) {
   const questions = rows.filter((r) => r.question_id);
+  const { role, category, teams, interview } = rows[0];
   return (
     <div className="flex flex-col rounded-xl border border-slate-200 bg-white p-4">
-      <h3 className="text-sm font-semibold text-slate-900">{rows[0].role}</h3>
+      <h3 className="text-sm font-semibold text-slate-900">{role}</h3>
+      <p className="mt-1 text-xs text-slate-500">{category}{interview ? "" : " · No interview"}</p>
+      {teams?.length ? <p className="mt-1 text-xs text-slate-500">Teams: {teams.join(", ")}</p> : null}
 
       <ol className="mt-3 flex-1 space-y-4">
         {questions.map((q, i) => (

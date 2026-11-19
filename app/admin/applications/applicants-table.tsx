@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import type { ApplicationRow } from "@/lib/applications";
+import { DEPARTMENTS } from "@/lib/departments";
 import { APPLICATION_STATUSES } from "@/lib/statuses";
-import { formatDate } from "../data";
+import { formatDate, formatDateTime } from "../data";
 import { td, th } from "../ui";
 import { toCsv } from "./csv";
 import RowLink from "./row-link";
@@ -14,10 +16,11 @@ const label = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function download(apps: ApplicationRow[]) {
   const csv = toCsv([
-    ["First name", "Last name", "Email", "Phone", "Position", "Department", "College", "Course, Year, Section", "Status", "Submitted"],
+    ["First name", "Last name", "Email", "Phone", "Position", "Team", "Department", "College", "Course, Year, Section", "Status", "Submitted", "Interview"],
     ...apps.map((a) => [
-      a.first_name, a.last_name, a.email, a.phone, a.role, a.department,
+      a.first_name, a.last_name, a.email, a.phone, a.role, a.team, a.department,
       a.college_campus, a.course_year_section, label(a.status), new Date(a.created_at).toISOString().slice(0, 10),
+      a.interview_at && formatDateTime(a.interview_at),
     ]),
   ]);
   // BOM so Excel opens it as UTF-8 (names with ñ etc.)
@@ -32,9 +35,13 @@ function download(apps: ApplicationRow[]) {
 
 export default function ApplicantsTable({ apps }: { apps: ApplicationRow[] }) {
   const [status, setStatus] = useState("all");
+  const [department, setDepartment] = useState("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const router = useRouter();
+  const [refreshing, startRefresh] = useTransition();
 
-  const shown = status === "all" ? apps : apps.filter((a) => a.status === status);
+  const inDept = department === "all" ? apps : apps.filter((a) => a.department === department);
+  const shown = status === "all" ? inDept : inDept.filter((a) => a.status === status);
   const picked = shown.filter((a) => selected.has(a.id));
   const allPicked = shown.length > 0 && picked.length === shown.length;
 
@@ -66,22 +73,45 @@ export default function ApplicantsTable({ apps }: { apps: ApplicationRow[] }) {
               }`}
             >
               {label(s)}{" "}
-              <span className="tabular-nums opacity-60">{s === "all" ? apps.length : apps.filter((a) => a.status === s).length}</span>
+              <span className="tabular-nums opacity-60">{s === "all" ? inDept.length : inDept.filter((a) => a.status === s).length}</span>
             </button>
           ))}
+          <select
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
+            aria-label="Filter by department"
+            className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 outline-none transition hover:border-brand-500 focus:border-brand-500"
+          >
+            <option value="all">All departments</option>
+            {DEPARTMENTS.map((d) => (
+              <option key={d.slug} value={d.name}>
+                {d.name} ({apps.filter((a) => a.department === d.name).length})
+              </option>
+            ))}
+          </select>
         </div>
-        <button
-          type="button"
-          disabled={shown.length === 0}
-          onClick={() => download(picked.length ? picked : shown)}
-          className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-brand-700 disabled:opacity-50"
-        >
-          Export CSV ({picked.length || shown.length})
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            disabled={refreshing}
+            onClick={() => startRefresh(() => router.refresh())}
+            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 transition hover:border-brand-500 hover:text-brand-700 disabled:opacity-50"
+          >
+            {refreshing ? "Refreshing…" : "Refresh"}
+          </button>
+          <button
+            type="button"
+            disabled={shown.length === 0}
+            onClick={() => download(picked.length ? picked : shown)}
+            className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-brand-700 disabled:opacity-50"
+          >
+            Export CSV ({picked.length || shown.length})
+          </button>
+        </div>
       </div>
 
       {shown.length === 0 ? (
-        <p className="py-6 text-sm text-slate-500">No applicants with this status.</p>
+        <p className="py-6 text-sm text-slate-500">No applicants match these filters.</p>
       ) : (
         <div className="-mx-3 overflow-x-auto">
           <table className="w-full text-sm">
@@ -118,7 +148,10 @@ export default function ApplicantsTable({ apps }: { apps: ApplicationRow[] }) {
                       {a.first_name} {a.last_name}
                     </Link>
                   </td>
-                  <td className={`${td} text-slate-700`}>{a.role}</td>
+                  <td className={`${td} text-slate-700`}>
+                    {a.role}
+                    {a.team && <span className="block text-xs text-slate-500">{a.team}</span>}
+                  </td>
                   <td className={`${td} text-slate-700`}>{a.college_campus}</td>
                   <td className={`${td} whitespace-nowrap tabular-nums text-slate-600`}>{formatDate(a.created_at)}</td>
                   <td className={`${td} text-right`}>

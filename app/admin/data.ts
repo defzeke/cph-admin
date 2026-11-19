@@ -9,3 +9,6 @@ export const tools: { name: string; description: string; repo: string; url?: str
 
 const dateFormat = new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric", year: "numeric", timeZone: "Asia/Manila" });
 export const formatDate = (date: string | Date) => dateFormat.format(new Date(date));
+
+const dateTimeFormat = new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Manila" });
+export const formatDateTime = (date: string | Date) => dateTimeFormat.format(new Date(date));

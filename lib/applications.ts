@@ -10,6 +10,8 @@ export type ApplicationRow = {
   last_name: string;
   college_campus: string;
   role: string;
+  team: string | null;
+  interview_at: Date | null;
   department: string;
   email: string;
   phone: string;
@@ -19,7 +21,7 @@ export type ApplicationRow = {
 export async function listApplications() {
   const { rows } = await pool.query<ApplicationRow>(
     `SELECT a.id::text AS id, a.created_at, a.status, p.first_name, p.last_name, p.college_campus,
-            r.name AS role, d.name AS department, p.email, p.phone, p.course_year_section
+            r.name AS role, a.team, a.interview_at, d.name AS department, p.email, p.phone, p.course_year_section
      FROM applications a
      JOIN registration_personal_info p ON p.id = a.user_id
      JOIN department_roles r ON r.id = a.role_id
@@ -44,7 +46,7 @@ export async function getApplication(id: string) {
     }
   >(
     `SELECT a.id::text AS id, a.created_at, a.status, p.first_name, p.last_name, p.college_campus,
-            r.name AS role, d.name AS department, p.email, p.pup_webmail, p.phone, p.discord_username,
+            r.name AS role, a.team, a.interview_at, d.name AS department, p.email, p.pup_webmail, p.phone, p.discord_username,
             p.facebook_link, p.facebook_shared_post, p.linkedin_link, p.course_year_section, p.certificate_link
      FROM applications a
      JOIN registration_personal_info p ON p.id = a.user_id
@@ -71,6 +73,9 @@ export type QuestionRow = {
   closed: boolean;
   role_id: string;
   role: string;
+  category: string;
+  teams: string[] | null;
+  interview: boolean;
   question_id: string | null;
   prompt: string | null;
   answers: number;
@@ -79,10 +84,10 @@ export type QuestionRow = {
 export async function listQuestions() {
   const { rows } = await pool.query<QuestionRow>(
     `SELECT d.slug AS department_slug, d.name AS department, d.closed, r.id::text AS role_id, r.name AS role,
-            q.id::text AS question_id, q.prompt,
+            r.category, r.teams, r.interview, q.id::text AS question_id, q.prompt,
             (SELECT count(*)::int FROM department_answers x WHERE x.question_id = q.id) AS answers
      FROM departments d
-     JOIN department_roles r ON r.department_id = d.id
+     JOIN department_roles r ON r.department_id = d.id AND r.category IS NOT NULL -- null category = retired role
      LEFT JOIN department_questions q ON q.role_id = r.id AND q.active
      ORDER BY d.id, r.position, r.id, q.position, q.id`,
   );

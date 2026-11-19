@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { getApplication } from "@/lib/applications";
-import { formatDate } from "../../data";
+import { formatDate, formatDateTime } from "../../data";
 import { Panel } from "../../ui";
 import ApplicationStatusSelect from "../status-select";
 
@@ -50,11 +50,12 @@ async function Applicant({ params }: { params: Promise<{ id: string }> }) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-slate-900">{a.first_name} {a.last_name}</h2>
-            <p className="mt-1 text-sm text-slate-600">{a.role} · {a.department}</p>
+            <p className="mt-1 text-sm text-slate-600">{[a.role, a.team, a.department].filter(Boolean).join(" · ")}</p>
           </div>
           <div className="text-right">
             <ApplicationStatusSelect key={a.status} id={a.id} status={a.status} />
             <p className="mt-2 text-xs text-slate-500">Submitted {formatDate(a.created_at)}</p>
+            {a.interview_at && <p className="mt-1 text-xs text-slate-500">Interview {formatDateTime(a.interview_at)}</p>}
           </div>
         </div>
       </Panel>
