@@ -8,6 +8,7 @@ import { DEPARTMENTS } from "@/lib/departments";
 import { APPLICATION_STATUSES } from "@/lib/statuses";
 import { formatDate, formatDateTime } from "../data";
 import { td, th } from "../ui";
+import { setApplicationsStatus } from "./actions";
 import { toCsv } from "./csv";
 import RowLink from "./row-link";
 import ApplicationStatusSelect from "./status-select";
@@ -80,7 +81,7 @@ export default function ApplicantsTable({ apps }: { apps: ApplicationRow[] }) {
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
             aria-label="Filter by department"
-            className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 outline-none transition hover:border-brand-500 focus:border-brand-500"
+            className="w-full rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 outline-none transition hover:border-brand-500 focus:border-brand-500 sm:w-auto sm:py-1"
           >
             <option value="all">All departments</option>
             {DEPARTMENTS.map((d) => (
@@ -90,12 +91,32 @@ export default function ApplicantsTable({ apps }: { apps: ApplicationRow[] }) {
             ))}
           </select>
         </div>
-        <div className="flex gap-2">
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+          {picked.length > 0 && (
+            <form action={setApplicationsStatus} className="flex w-full items-center gap-2 sm:w-auto">
+              {picked.map((a) => <input key={a.id} type="hidden" name="id" value={a.id} />)}
+              <label htmlFor="batch-status" className="text-xs font-medium text-slate-600">
+                Mark {picked.length} selected as
+              </label>
+              <select
+                id="batch-status"
+                name="status"
+                value=""
+                onChange={(e) => e.currentTarget.form?.requestSubmit()}
+                className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 outline-none transition hover:border-brand-500 focus:border-brand-500 sm:flex-none"
+              >
+                <option value="" disabled>Choose status…</option>
+                {APPLICATION_STATUSES.map((s) => (
+                  <option key={s} value={s}>{label(s)}</option>
+                ))}
+              </select>
+            </form>
+          )}
           <button
             type="button"
             disabled={refreshing}
             onClick={() => startRefresh(() => router.refresh())}
-            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 transition hover:border-brand-500 hover:text-brand-700 disabled:opacity-50"
+            className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 transition hover:border-brand-500 hover:text-brand-700 disabled:opacity-50 sm:flex-none"
           >
             {refreshing ? "Refreshing…" : "Refresh"}
           </button>
@@ -103,7 +124,7 @@ export default function ApplicantsTable({ apps }: { apps: ApplicationRow[] }) {
             type="button"
             disabled={shown.length === 0}
             onClick={() => download(picked.length ? picked : shown)}
-            className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-brand-700 disabled:opacity-50"
+            className="flex-1 rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-brand-700 disabled:opacity-50 sm:flex-none"
           >
             Export CSV ({picked.length || shown.length})
           </button>
@@ -120,11 +141,11 @@ export default function ApplicantsTable({ apps }: { apps: ApplicationRow[] }) {
                 <th className={`${th} w-10`}>
                   <input type="checkbox" checked={allPicked} onChange={toggleAll} aria-label="Select all shown" className="h-4 w-4 accent-brand-600" />
                 </th>
-                <th className={`${th} w-12`}>#</th>
+                <th className={`${th} hidden w-12 sm:table-cell`}>#</th>
                 <th className={th}>Name</th>
-                <th className={th}>Position</th>
-                <th className={th}>College</th>
-                <th className={th}>Submitted</th>
+                <th className={`${th} hidden md:table-cell`}>Position</th>
+                <th className={`${th} hidden lg:table-cell`}>College</th>
+                <th className={`${th} hidden lg:table-cell`}>Submitted</th>
                 <th className={`${th} text-right`}>Status</th>
               </tr>
             </thead>
@@ -142,18 +163,25 @@ export default function ApplicantsTable({ apps }: { apps: ApplicationRow[] }) {
                     />
                   </td>
                   {/* numbered by submission order across all applicants: the newest gets the highest number */}
-                  <td className={`${td} tabular-nums text-slate-500`}>{apps.length - apps.indexOf(a)}</td>
-                  <td className={`${td} whitespace-nowrap font-medium text-slate-900`}>
+                  <td className={`${td} hidden tabular-nums text-slate-500 sm:table-cell`}>{apps.length - apps.indexOf(a)}</td>
+                  <td className={`${td} font-medium text-slate-900 md:whitespace-nowrap`}>
                     <Link href={`/admin/applications/${a.id}`} className="hover:underline">
                       {a.first_name} {a.last_name}
                     </Link>
+                    {/* small screens: the hidden columns stack here */}
+                    <span className="mt-0.5 block text-xs font-normal text-slate-600 md:hidden">
+                      {a.role}{a.team && ` · ${a.team}`}
+                    </span>
+                    <span className="block text-xs font-normal text-slate-500 lg:hidden">
+                      {a.college_campus} · {formatDate(a.created_at)}
+                    </span>
                   </td>
-                  <td className={`${td} text-slate-700`}>
+                  <td className={`${td} hidden text-slate-700 md:table-cell`}>
                     {a.role}
                     {a.team && <span className="block text-xs text-slate-500">{a.team}</span>}
                   </td>
-                  <td className={`${td} text-slate-700`}>{a.college_campus}</td>
-                  <td className={`${td} whitespace-nowrap tabular-nums text-slate-600`}>{formatDate(a.created_at)}</td>
+                  <td className={`${td} hidden text-slate-700 lg:table-cell`}>{a.college_campus}</td>
+                  <td className={`${td} hidden whitespace-nowrap tabular-nums text-slate-600 lg:table-cell`}>{formatDate(a.created_at)}</td>
                   <td className={`${td} text-right`}>
                     {/* key resets the select if the saved status changes */}
                     <ApplicationStatusSelect key={a.status} id={a.id} status={a.status} />

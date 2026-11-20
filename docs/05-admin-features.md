@@ -159,7 +159,7 @@ department filter, and a `Set` of selected ids. Behaviour worth preserving:
   selection stay.
 - **Row numbering** is `apps.length - apps.indexOf(a)`, i.e. numbered by submission order across all
   applicants with the newest highest — not 1..n per filtered view
-  (`applicants-table.tsx:115`).
+  (`applicants-table.tsx:166`).
 - **Select all** applies to the currently shown rows and toggles between "select all" and "clear
   those".
 - **CSV export** exports the selection if there is one, otherwise everything currently shown. The
@@ -169,6 +169,11 @@ department filter, and a `Set` of selected ids. Behaviour worth preserving:
   ticking a box does not navigate.
 - **Status changes inline** through `ApplicationStatusSelect`, which stops click propagation and
   submits on change.
+- **Small screens**: `#` hides below `sm`, Position below `md`, College and Submitted below `lg`.
+  Hidden fields stack under the name instead. Toolbar buttons and the batch control go full width
+  below `sm`.
+- **Batch status**: with rows ticked, a "Mark N selected as [Choose status…]" control shows in the toolbar. Picking a status
+  calls `setApplicationsStatus` for every selected row that is currently shown. Selection stays.
 
 CSV generation lives in `csv.ts` and is worth knowing in detail:
 

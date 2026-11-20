@@ -11,6 +11,7 @@ the admin allowlist.
 | `login` | `app/login/actions.ts:12` | `email`, `password` | none (throttled) | admin DB (`login_attempts`) |
 | `logout` | `app/login/actions.ts:33` | — | none | Neon Auth session |
 | `setApplicationStatus` | `app/admin/applications/actions.ts:8` | `id`, `status` | `requireAdmin` | forms DB |
+| `setApplicationsStatus` | `app/admin/applications/actions.ts:20` | `id` (repeated), `status` | `requireAdmin` | forms DB |
 | `updateQuestion` | `app/admin/applications/questions/actions.ts:23` | `id`, `prompt` | `requireAdmin` | forms DB |
 | `addQuestion` | `app/admin/applications/questions/actions.ts:59` | `roleId`, `prompt` | `requireAdmin` | forms DB |
 | `setDepartmentClosed` | `app/admin/applications/questions/actions.ts:74` | `slug`, `closed` | `requireAdmin` | forms DB |
@@ -93,6 +94,13 @@ await pool.query("UPDATE applications SET status = $2 WHERE id = $1", [id, statu
 Targets the **forms** database. Revalidates `/admin/applications`, the applicant's detail page, and
 `/admin` (so the dashboard status badges update). A non-existent id is not an error; the update just
 affects zero rows.
+
+### `setApplicationsStatus`
+
+`app/admin/applications/actions.ts:20-31`. Batch version for the applicants toolbar. Reads every
+`id` field, rejects the whole batch if any id fails the regex or the list is empty, then runs one
+`UPDATE … WHERE id = ANY($1::bigint[])`. Revalidates `/admin/applications` as a layout (so every
+detail page) and `/admin`.
 
 ### `updateQuestion`
 
