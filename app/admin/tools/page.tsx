@@ -15,9 +15,11 @@ export default function ToolsPage() {
                   Open
                 </a>
               )}
-              <a href={t.repo} target="_blank" rel="noopener noreferrer" className="text-brand-700 underline-offset-2 hover:underline">
-                Repository
-              </a>
+              {t.repo && (
+                <a href={t.repo} target="_blank" rel="noopener noreferrer" className="text-brand-700 underline-offset-2 hover:underline">
+                  Repository
+                </a>
+              )}
             </div>
           </Panel>
         ))}

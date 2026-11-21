@@ -229,9 +229,9 @@ submitting the edit.
 
 ## Tools — `/admin/tools`
 
-A static card grid from `tools` in `app/admin/data.ts`. Each entry has `name`, `description`, `repo`,
-and an optional `url`; `Open` only renders when a live URL exists. Today there is one entry,
-Membership Forms, pointing at `github.com/defzeke/cph-membership-forms`. Add new systems there.
+A static card grid from `tools` in `app/admin/data.ts`. Each entry has `name`, `description`, and an
+optional `repo` and `url`; `Open` and `Repository` only render when set. Today: Membership Forms
+(repo only) and Mail (`mail.cyberph.org`, link only). Add new systems there.
 
 ## Neon health check — `/admin/neon-check`
 

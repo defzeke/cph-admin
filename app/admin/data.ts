@@ -1,9 +1,14 @@
 // Systems built for CyberPH. Add new ones here; `url` is the live site once deployed.
-export const tools: { name: string; description: string; repo: string; url?: string }[] = [
+export const tools: { name: string; description: string; repo?: string; url?: string }[] = [
   {
     name: "Membership Forms",
     description: "Member and officer registration, with department picks and screening questions per role.",
     repo: "https://github.com/defzeke/cph-membership-forms",
+  },
+  {
+    name: "Mail",
+    description: "CyberPH webmail for org email accounts.",
+    url: "https://mail.cyberph.org/",
   },
 ];
 
