@@ -147,14 +147,23 @@ Both tabs stay highlighted sensibly on detail pages: the tabs component treats a
 `app/admin/applications/page.tsx` renders four counters (all, pending, interview, accepted), a
 per-department count table, and the table itself.
 
-`ApplicantsTable` (`applicants-table.tsx`) holds three pieces of state: the status filter, the
-department filter, and a `Set` of selected ids. Behaviour worth preserving:
+`ApplicantsTable` (`applicants-table.tsx`) holds the status, interview, and department filters, the
+Discord & interview toggle, and a `Set` of selected ids. Behaviour worth preserving:
 
-- **Filter chips** are `all` plus `APPLICATION_STATUSES`, each with a count computed from the
-  department-filtered list, ignoring the status filter.
+- **Status filter** is one select: `All` plus `APPLICATION_STATUSES`, each with a count computed
+  from the department-filtered list, ignoring the status filter.
 - **Department filter** is a select built from `DEPARTMENTS`, matched on department name. Each
   option shows that department's total.
 - **Position** shows the applicant's team underneath when the role has teams.
+- **Interview schedule** is a select next to status (`interview.ts`): any (submission order),
+  earliest or latest first (unbooked last), or only today / upcoming / past / not booked. Today is
+  the Manila calendar day; past sorts most recent first. It stacks on the status and department
+  filters, and CSV export follows the shown order. `node --test app/admin/applications/interview.test.mjs`
+  checks it.
+- **Discord & interview** is a toggle (`aria-pressed`). On, it adds a column with each applicant's
+  Discord username and booked interview time (Manila), or "No Discord" / "No interview booked".
+  Below `md` the same line stacks under the name. While on, the College column hides to make room.
+  Read-only; it is off on every page load.
 - **Refresh** calls `router.refresh()` to re-fetch applicants without a page reload. Filters and
   selection stay.
 - **Row numbering** is `apps.length - apps.indexOf(a)`, i.e. numbered by submission order across all

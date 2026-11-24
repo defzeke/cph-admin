@@ -86,6 +86,7 @@ Keyed by the capitalised value (`app/admin/ui.tsx:42-59`):
 |---|---|
 | `Pending`, `Open` | Cream background, gold border, amber text |
 | `Interview`, `In Progress`, `Ongoing`, `Lead` | Blue-tinted |
+| `Under review` | Sky |
 | `Accepted` | Emerald |
 | `Declined` | Rose |
 | `Closed`, `Done` | Neutral slate |
@@ -118,7 +119,7 @@ column allowed to shrink uses `w-full max-w-0 truncate` with a `title` attribute
 Three control idioms repeat; copy them rather than inventing new ones:
 
 1. **Filter chips** — pill buttons with `aria-pressed`, dark slate when active
-   (`applicants-table.tsx:57-71`, `members-table.tsx:40-53`). Each chip shows a count in
+   (`members-table.tsx:40-53`). Each chip shows a count in
    `tabular-nums opacity-60`.
 2. **Segmented control** — a bordered inline-flex group for two or three exclusive options, used for
    status (deadlines) and List/Grid (documents).

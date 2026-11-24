@@ -207,8 +207,9 @@ erDiagram
 | `department_answers` | `application_id`, `question_id`, `answer`; read only |
 
 `applications.status` is **free text** in the forms DB (no `CHECK`), lowercase, with `"pending"` as
-the value the forms app inserts. This app narrows it to four values via `APPLICATION_STATUSES`
-(`lib/statuses.ts:5`) and refuses anything else in `setApplicationStatus`.
+the value the forms app inserts. This app narrows it to five values via `APPLICATION_STATUSES`
+(`lib/statuses.ts:5`: pending, under review, interview, accepted, declined) and refuses anything else in `setApplicationStatus`. Adding a
+status is a code change only; no migration, since there is no constraint to widen.
 
 `pup_webmail` is legacy: older applicants were asked for it, newer ones are not. The detail page
 only renders the row when a value exists (`app/admin/applications/[id]/page.tsx:45`).
@@ -217,8 +218,8 @@ only renders the row when a value exists (`app/admin/applications/[id]/page.tsx:
 
 Three queries matter, and all three are worth reading in full:
 
-**`listApplications()`** (`lib/applications.ts:19-30`) joins application → personal info → role →
-department and sorts newest first. The department comes from `departments d JOIN department_roles r`
+**`listApplications()`** (`lib/applications.ts:22-33`) joins application → personal info → role →
+department and sorts newest first. It also pulls `discord_username` for the list's Discord & interview toggle. The department comes from `departments d JOIN department_roles r`
 on `r.department_id`, *not* from a column on the application:
 
 ```sql

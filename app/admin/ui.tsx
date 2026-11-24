@@ -41,6 +41,7 @@ export function Panel({
 
 const statusStyles: Record<string, string> = {
   Pending: "border-brand-200 bg-brand-50 text-amber-800",
+  "Under review": "border-sky-200 bg-sky-50 text-sky-800",
   Interview: "border-brand-500/30 bg-brand-500/10 text-brand-700",
   Accepted: "border-emerald-200 bg-emerald-50 text-emerald-800",
   Declined: "border-rose-200 bg-rose-50 text-rose-700",
